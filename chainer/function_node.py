@@ -11,6 +11,7 @@ from chainer import _backprop_utils
 from chainer.backends import cuda
 from chainer import configuration
 from chainer import function_hook
+from chainer.utils import tracing
 from chainer.utils import type_check
 from chainer import variable
 
@@ -220,6 +221,9 @@ Use apply() method instead.\
             A tuple of output :class:`~chainer.Variable` objects.
 
         """
+        trace_name = '%s' % self.label
+        tracing.start_trace('apply', trace_name)
+
         input_vars = [chainer.as_variable(x) for x in inputs]
         in_data = tuple([x.data for x in input_vars])
         requires_grad = any([x.requires_grad for x in input_vars])
@@ -308,6 +312,7 @@ Use apply() method instead.\
 
             self.lazy_grad_sum = configuration.config.lazy_grad_sum
 
+        tracing.end_trace('apply', trace_name)
         return ret
 
     def _check_data_type_forward(self, in_data):
