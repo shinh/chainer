@@ -7,6 +7,7 @@ import six
 from chainer.backends import cuda
 from chainer.functions.activation import lstm
 from chainer.functions.array import concat
+from chainer.functions.array import pad
 from chainer.functions.array import split_axis
 from chainer import initializers
 from chainer import link
@@ -33,20 +34,27 @@ class LSTMBase(link.Chain):
         self.forget_bias_init = forget_bias_init
 
         with self.init_scope():
-            self.upward = linear.Linear(in_size, 4 * out_size, initialW=0)
-            self.lateral = linear.Linear(out_size, 4 * out_size, initialW=0,
-                                         nobias=True)
+            if True:
+                self.upward = linear.Linear(in_size + out_size,
+                                            4 * out_size, initialW=0)
+                self.lateral = None
+            else:
+                self.upward = linear.Linear(in_size, 4 * out_size, initialW=0)
+                self.lateral = linear.Linear(out_size, 4 * out_size, initialW=0,
+                                             nobias=True)
             if in_size is not None:
                 self._initialize_params()
 
     def _initialize_params(self):
-        lateral_init = initializers._get_initializer(self.lateral_init)
+        if self.lateral is not None:
+            lateral_init = initializers._get_initializer(self.lateral_init)
         upward_init = initializers._get_initializer(self.upward_init)
         bias_init = initializers._get_initializer(self.bias_init)
         forget_bias_init = initializers._get_initializer(self.forget_bias_init)
 
         for i in six.moves.range(0, 4 * self.state_size, self.state_size):
-            lateral_init(self.lateral.W.data[i:i + self.state_size, :])
+            if self.lateral is not None:
+                lateral_init(self.lateral.W.data[i:i + self.state_size, :])
             upward_init(self.upward.W.data[i:i + self.state_size, :])
 
         a, i, f, o = lstm._extract_gates(
@@ -289,6 +297,24 @@ class LSTM(LSTMBase):
         """
         self.c = self.h = None
 
+    def call2(self, x):
+        batch = x.shape[0]
+        if self.h is None:
+            x = pad.pad(x, [(0, 0), (0, self.state_size)], 'constant')
+        else:
+            x = concat.concat([x, self.h])
+        lstm_in = self.upward(x)
+
+        if self.c is None:
+            xp = self.xp
+            with cuda.get_device_from_id(self._device_id):
+                self.c = variable.Variable(
+                    xp.zeros((batch, self.state_size), dtype=x.dtype))
+        self.c, y = lstm.lstm(self.c, lstm_in)
+        self.h = y
+
+        return y
+
     def __call__(self, x):
         """Updates the internal state and returns the LSTM outputs.
 
@@ -304,6 +330,9 @@ class LSTM(LSTMBase):
                 in_size = functools.reduce(operator.mul, x.shape[1:], 1)
                 self.upward._initialize_params(in_size)
                 self._initialize_params()
+
+        if self.lateral is None:
+            return self.call2(x)
 
         batch = x.shape[0]
         lstm_in = self.upward(x)
