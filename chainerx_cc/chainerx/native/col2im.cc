@@ -117,7 +117,7 @@ Array Col2Im(
         }
     });
 
-    std::vector<ArrayIndex> slice{ArrayIndex{Slice{}}, ArrayIndex{Slice{}}};  // All batch and channel dimensions.
+    ArrayIndices slice{ArrayIndex{Slice{}}, ArrayIndex{Slice{}}};  // All batch and channel dimensions.
     for (int8_t i = 0; i < ndim; ++i) {
         slice.emplace_back(Slice{pad[i], pad[i] + out_size[i]});
     }

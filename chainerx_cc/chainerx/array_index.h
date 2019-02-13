@@ -2,8 +2,10 @@
 
 #include <cstdint>
 
+#include "chainerx/constant.h"
 #include "chainerx/error.h"
 #include "chainerx/slice.h"
+#include "chainerx/stack_vector.h"
 
 namespace chainerx {
 
@@ -20,6 +22,7 @@ public:
     ArrayIndex(int64_t index) : tag_{ArrayIndexTag::kSingleElement}, index_{index} {}  // NOLINT(runtime/explicit)
     ArrayIndex(Slice slice) : tag_{ArrayIndexTag::kSlice}, slice_{slice} {}  // NOLINT(runtime/explicit)
     ArrayIndex(NewAxis) : tag_{ArrayIndexTag::kNewAxis} {}  // NOLINT(runtime/explicit)
+    ArrayIndex() : tag_{ArrayIndexTag::kSlice} {}
 
     ArrayIndexTag tag() const { return tag_; }
 
@@ -42,5 +45,9 @@ private:
     int64_t index_{};
     Slice slice_;
 };
+
+// Up to `kMaxNdim * 2` indices since there can be `kMaxNdim`
+// of indices with `kNewAxis` type.
+typedef StackVector<ArrayIndex, kMaxNdim * 2> ArrayIndices;
 
 }  // namespace chainerx

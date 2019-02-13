@@ -94,7 +94,7 @@ Array Im2Col(
     // Create a padded copy of the input image.
     // TODO(hvy): Use the Pad function when implemented.
     Shape padded_shape = x.shape();
-    std::vector<ArrayIndex> unpadded_slice{ArrayIndex{Slice{}}, ArrayIndex{Slice{}}};  // All batch and channel dimensions.
+    ArrayIndices unpadded_slice{ArrayIndex{Slice{}}, ArrayIndex{Slice{}}};  // All batch and channel dimensions.
     for (int64_t i = 0; i < ndim; ++i) {
         padded_shape[i + 2] += pad[i] * 2 + (cover_all ? stride[i] - 1 : 0);  // Pad on both sides.
         unpadded_slice.emplace_back(Slice{pad[i], pad[i] + x.shape()[i + 2]});

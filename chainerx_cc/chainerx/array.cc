@@ -191,7 +191,7 @@ Array Array::operator/(const Array& rhs) const { return chainerx::Divide(*this, 
 
 Array Array::operator/(Scalar rhs) const { return chainerx::Divide(*this, rhs); }
 
-Array Array::At(const std::vector<ArrayIndex>& indices) const { return internal::At(*this, indices); }
+Array Array::At(const ArrayIndices& indices) const { return internal::At(*this, indices); }
 
 Array Array::Transpose(const OptionalAxes& axes) const { return chainerx::Transpose(*this, axes); }
 

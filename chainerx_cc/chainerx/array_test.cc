@@ -1311,7 +1311,7 @@ TEST(ArrayAtTest, At) {
     testing::ContextSession context_session{};
     Shape input_shape{2, 3, 1};
     Shape output_shape{1, 2, 1};
-    std::vector<ArrayIndex> indices{-1, NewAxis{}, Slice{1, 3}};
+    ArrayIndices indices{-1, NewAxis{}, Slice{1, 3}};
     Array a = testing::BuildArray(input_shape).WithLinearData<T>();
     Array b = a.At(indices);
 

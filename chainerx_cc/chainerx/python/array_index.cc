@@ -38,8 +38,8 @@ ArrayIndex MakeArrayIndex(py::handle handle) {
     throw py::index_error{"only integers, slices (`:`), and chainerx.newaxis (`None`) are valid indices"};
 }
 
-std::vector<ArrayIndex> MakeArrayIndicesFromTuple(py::tuple tup) {
-    std::vector<ArrayIndex> indicies;
+ArrayIndices MakeArrayIndicesFromTuple(py::tuple tup) {
+    ArrayIndices indicies;
     for (auto handle : tup) {
         indicies.emplace_back(MakeArrayIndex(handle));
     }
@@ -48,7 +48,7 @@ std::vector<ArrayIndex> MakeArrayIndicesFromTuple(py::tuple tup) {
 
 }  // namespace
 
-std::vector<ArrayIndex> MakeArrayIndices(py::handle handle) {
+ArrayIndices MakeArrayIndices(py::handle handle) {
     if (py::isinstance<py::tuple>(handle)) {
         return MakeArrayIndicesFromTuple(py::cast<py::tuple>(handle));
     }

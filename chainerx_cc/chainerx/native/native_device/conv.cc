@@ -107,7 +107,7 @@ Array NativeDevice::ConvTranspose(
 
     // Add bias, if given.
     if (b.has_value()) {
-        std::vector<ArrayIndex> slice{NewAxis{}, Slice{}};
+        ArrayIndices slice{NewAxis{}, Slice{}};
         for (size_t i = 0; i < out_size.size(); ++i) {
             slice.emplace_back(NewAxis{});
         }

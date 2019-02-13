@@ -22,7 +22,6 @@ template <typename T, stack_vector_detail::size_type N>
 class StackVector {
 private:
     static_assert(std::is_default_constructible<T>::value, "StackVector requires default constructible element type.");
-    static_assert(std::is_trivially_destructible<T>::value, "StackVector requires trivially destructible element type.");
     using BaseContainer = std::array<T, N>;
     using BaseIterator = typename BaseContainer::iterator;
 

@@ -102,7 +102,7 @@ public:
     Array operator/(Scalar rhs) const;
 
     // Returns a view selected with the indices.
-    Array At(const std::vector<ArrayIndex>& indices) const;
+    Array At(const ArrayIndices& indices) const;
 
     // Returns a transposed view of the array.
     Array Transpose(const OptionalAxes& axes = nonstd::nullopt) const;

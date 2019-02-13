@@ -39,7 +39,7 @@ TEST_THREAD_SAFE_P(IndexingTest, At) {
     using T = int32_t;
     Shape input_shape{2, 3, 1};
     Shape output_shape{1, 2, 1};
-    std::vector<ArrayIndex> indices{-1, NewAxis{}, Slice{1, 3}};
+    ArrayIndices indices{-1, NewAxis{}, Slice{1, 3}};
     Array a = testing::BuildArray(input_shape).WithLinearData<T>();
     Array e = testing::BuildArray(output_shape).WithData<T>({4, 5});
 
@@ -62,7 +62,7 @@ TEST_THREAD_SAFE_P(IndexingTest, At) {
 TEST_P(IndexingTest, InvalidAt1) {
     using T = int32_t;
     Shape input_shape{2, 3};
-    std::vector<ArrayIndex> indices{0, 0, 0};
+    ArrayIndices indices{0, 0, 0};
     Array a = testing::BuildArray(input_shape).WithLinearData<T>();
     EXPECT_THROW(internal::At(a, indices), DimensionError);
 }
@@ -71,7 +71,7 @@ TEST_P(IndexingTest, InvalidAt1) {
 TEST_P(IndexingTest, InvalidAt2) {
     using T = int32_t;
     Shape input_shape{2, 3};
-    std::vector<ArrayIndex> indices{2};
+    ArrayIndices indices{2};
     Array a = testing::BuildArray(input_shape).WithLinearData<T>();
     EXPECT_THROW(internal::At(a, indices), DimensionError);
 }
@@ -79,7 +79,7 @@ TEST_P(IndexingTest, InvalidAt2) {
 TEST_P(IndexingTest, AtBackward) {
     CheckBackward(
             [](const std::vector<Array>& xs) -> std::vector<Array> {
-                std::vector<ArrayIndex> indices{1, NewAxis{}, Slice{1, 3}};
+                ArrayIndices indices{1, NewAxis{}, Slice{1, 3}};
                 return {internal::At(xs[0], indices)};
             },
             {(*testing::BuildArray({2, 3}).WithData<float>({1.f, -1.f, 2.f, -2.f, 3.f, -3.f})).RequireGrad()},
@@ -90,7 +90,7 @@ TEST_P(IndexingTest, AtBackward) {
 TEST_P(IndexingTest, AtDoubleBackward) {
     CheckDoubleBackwardComputation(
             [](const std::vector<Array>& xs) -> std::vector<Array> {
-                std::vector<ArrayIndex> indices{0, NewAxis{}, Slice{1, 3}};
+                ArrayIndices indices{0, NewAxis{}, Slice{1, 3}};
                 auto y = internal::At(xs[0], indices);
                 return {y * y};  // to make it nonlinear
             },

@@ -31,7 +31,7 @@ namespace {
 //
 // It is not in-place  operation: the input arrays are not altered.
 // It is differentiable with respect to `a` and `b`.
-Array AddAt(const Array& a, const std::vector<ArrayIndex>& indices, const Array& b) {
+Array AddAt(const Array& a, const StackVector<ArrayIndex, kMaxNdim * 2>& indices, const Array& b) {
     // TODO(sonots): dtype conversion
     CheckEqual(a.dtype(), b.dtype());
 
@@ -62,7 +62,7 @@ Array AddAt(const Array& a, const std::vector<ArrayIndex>& indices, const Array&
 
 }  // namespace
 
-Array At(const Array& a, const std::vector<ArrayIndex>& indices) {
+Array At(const Array& a, const ArrayIndices& indices) {
     Shape out_shape{};
     Strides out_strides{};
     int64_t out_offset = a.offset();
