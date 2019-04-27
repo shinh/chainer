@@ -117,7 +117,7 @@ class ShuffleNetV2(chainer.Chain):
             self.bn5 = L.BatchNormalization(out_channels[3])
             self.fc = L.Linear(out_channels[3], 1000)
 
-    def forward(self, x, t):
+    def forward(self, x, t=None):
         h = x
         h = F.relu(self.bn1(self.conv1(x)))
         h = F.max_pooling_2d(F.relu(h), 3, stride=2)
@@ -128,17 +128,30 @@ class ShuffleNetV2(chainer.Chain):
         h = F.average_pooling_2d(h, 7, stride=1)
         h = self.fc(h)
 
+        if t is None:
+            return h
+
         loss = F.softmax_cross_entropy(h, t)
         chainer.report({'loss': loss, 'accuracy': F.accuracy(h, t)}, self)
         return loss
 
 
-# import numpy as np
-#
-# model = BasicUnit(24)
-# print(model(np.random.rand(1, 24, 56, 56)).shape)
-# model = DownSampleUnit(24, 12)
-# print(model(np.random.rand(1, 24, 56, 56)).shape)
-#
-# model = ShuffleNetV2(1.0)
-# print(model(np.random.rand(1, 3, 224, 224).astype(np.float32), np.array([3])))
+def main():
+    import numpy as np
+    import onnx_chainer
+
+    #
+    # model = BasicUnit(24)
+    # print(model(np.random.rand(1, 24, 56, 56)).shape)
+    # model = DownSampleUnit(24, 12)
+    # print(model(np.random.rand(1, 24, 56, 56)).shape)
+    #
+    # model = ShuffleNetV2(1.0)
+    # print(model(np.random.rand(1, 3, 224, 224).astype(np.float32), np.array([3])))
+    model = ShuffleNetV2(2.0)
+    x = np.random.rand(1, 3, 224, 224).astype(np.float32)
+    onnx_chainer.export_testcase(model, [x], 'shufflenet_v2_x2.0')
+
+
+if __name__ == '__main__':
+    main()
