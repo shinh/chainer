@@ -27,6 +27,7 @@ import googlenetbn
 import nin
 import resnet50
 import resnext50
+import shufflenet_v2
 
 
 class PreprocessedDataset(chainer.dataset.DatasetMixin):
@@ -78,6 +79,7 @@ def main():
         'nin': nin.NIN,
         'resnet50': resnet50.ResNet50,
         'resnext50': resnext50.ResNeXt50,
+        'shufflenet_v2': shufflenet_v2.ShuffleNetV2,
     }
 
     dtypes = {
